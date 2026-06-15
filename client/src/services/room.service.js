@@ -1,0 +1,31 @@
+import api from './api';
+
+export const getRooms = async (params) => {
+  const response = await api.get('/rooms', { params });
+  return response.data;
+};
+
+export const getRoomById = async (id) => {
+  const response = await api.get(`/rooms/${id}`);
+  return response.data;
+};
+
+// Admin routes
+export const createRoom = async (formData) => {
+  const response = await api.post('/rooms', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return response.data;
+};
+
+export const updateRoom = async (id, formData) => {
+  const response = await api.put(`/rooms/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return response.data;
+};
+
+export const deleteRoom = async (id) => {
+  const response = await api.delete(`/rooms/${id}`);
+  return response.data;
+};
