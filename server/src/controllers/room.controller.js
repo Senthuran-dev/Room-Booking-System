@@ -1,14 +1,8 @@
-const Room = require('../models/Room');
+const Room = require('../models/Room.model');
 const APIFeatures = require('../utils/apiFeatures');
-const Booking = require('../models/Booking');
-const cloudinary = require('cloudinary').v2;
+const Booking = require('../models/Booking.model');
+const cloudinary = require('../config/cloudinary');
 const streamifier = require('streamifier');
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
 
 exports.getRooms = async (req, res, next) => {
   try {

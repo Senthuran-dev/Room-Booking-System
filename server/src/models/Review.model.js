@@ -1,32 +1,37 @@
 const mongoose = require('mongoose');
 
-const ReviewSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true },
-  rating: { type: Number, required: true, min: 1, max: 5 },
-  comment: { type: String, required: true, minlength: 10, maxlength: 500 }
-}, {
-  timestamps: true
+const reviewSchema = new mongoose.Schema({
+  room: { type: mongoose.Schema.ObjectId, ref: 'Room', required: true },
+  user: { type: mongoose.Schema.ObjectId, ref: 'User', required: true },
+  rating: { type: Number, min: 1, max: 5, required: [true, 'Please add a rating between 1 and 5'] },
+  comment: { type: String, required: [true, 'Please add a comment'] },
+  createdAt: { type: Date, default: Date.now }
 });
 
-ReviewSchema.post('save', async function() {
-  const Room = mongoose.model('Room');
-  const stats = await this.constructor.aggregate([
-    { $match: { room: this.room } },
-    { $group: { _id: '$room', averageRating: { $avg: '$rating' }, numReviews: { $sum: 1 } } }
+// Prevent duplicate reviews from same user for same room
+reviewSchema.index({ room: 1, user: 1 }, { unique: true });
+
+// Static method to get avg rating
+reviewSchema.statics.getAverageRating = async function(roomId) {
+  const obj = await this.aggregate([
+    { $match: { room: roomId } },
+    { $group: { _id: '$room', averageRating: { $avg: '$rating' } } }
   ]);
-
-  if (stats.length > 0) {
-    await Room.findByIdAndUpdate(this.room, {
-      averageRating: stats[0].averageRating,
-      numReviews: stats[0].numReviews
+  try {
+    await this.model('Room').findByIdAndUpdate(roomId, {
+      averageRating: obj[0] ? obj[0].averageRating : 0
     });
-  } else {
-    await Room.findByIdAndUpdate(this.room, {
-      averageRating: 0,
-      numReviews: 0
-    });
+  } catch (err) {
+    console.error(err);
   }
+};
+
+reviewSchema.post('save', function() {
+  this.constructor.getAverageRating(this.room);
 });
 
-module.exports = mongoose.model('Review', ReviewSchema);
+reviewSchema.pre('remove', function() {
+  this.constructor.getAverageRating(this.room);
+});
+
+module.exports = mongoose.model('Review', reviewSchema);

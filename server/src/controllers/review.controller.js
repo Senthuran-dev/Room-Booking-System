@@ -1,5 +1,5 @@
-const Review = require('../models/Review');
-const Booking = require('../models/Booking');
+const Review = require('../models/Review.model');
+const Booking = require('../models/Booking.model');
 
 exports.getReviews = async (req, res, next) => {
   try {

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { login } from '../services/auth.service';
-import { useAuthStore } from '../store/useAuthStore';
+import { login } from '../../services/auth.service';
+import { useAuthStore } from '../../store/useAuthStore';
+import { Mail, Lock } from 'lucide-react';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');

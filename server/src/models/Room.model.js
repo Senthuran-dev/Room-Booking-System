@@ -1,20 +1,15 @@
 const mongoose = require('mongoose');
 
-const RoomSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  type: { type: String, enum: ['single', 'double', 'suite', 'villa'], required: true },
-  pricePerNight: { type: Number, required: true, min: [1, 'Price must be greater than 0'] },
-  capacity: { type: Number, required: true },
-  amenities: [{ type: String }],
-  images: [{ type: String }],
-  isAvailable: { type: Boolean, default: true, required: true },
+const roomSchema = new mongoose.Schema({
+  name: { type: String, required: [true, 'Please add a room name'] },
+  type: { type: String, required: [true, 'Please add a room type'], enum: ['Standard', 'Deluxe', 'Suite'] },
+  description: { type: String, required: [true, 'Please add a description'] },
+  pricePerNight: { type: Number, required: [true, 'Please add a price'] },
+  capacity: { type: Number, required: [true, 'Please add maximum capacity'] },
+  amenities: [String],
+  images: [{ url: String, public_id: String }],
   averageRating: { type: Number, default: 0 },
-  numReviews: { type: Number, default: 0 }
-}, {
-  timestamps: true
+  createdAt: { type: Date, default: Date.now }
 });
 
-RoomSchema.index({ type: 1, pricePerNight: 1 });
-
-module.exports = mongoose.model('Room', RoomSchema);
+module.exports = mongoose.model('Room', roomSchema);

@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import FilterBar from '../components/FilterBar';
-import RoomCard from '../components/RoomCard';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import FilterBar from '../components/rooms/FilterBar';
+import RoomCard from '../components/rooms/RoomCard';
 
 const RoomsPage = () => {
   const [rooms, setRooms] = useState([]);
