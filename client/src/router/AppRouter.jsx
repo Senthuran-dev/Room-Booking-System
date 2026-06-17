@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 
-import Navbar from '../layouts/Navbar';
-import Footer from '../layouts/Footer';
+import Navbar from '../components/shared/Navbar';
+import Footer from '../components/shared/Footer';
 
 import HomePage from '../pages/HomePage';
 import RoomsPage from '../pages/RoomsPage';
@@ -9,14 +9,14 @@ import RoomDetailPage from '../pages/RoomDetailPage';
 import BookingPage from '../pages/BookingPage';
 import ProfilePage from '../pages/ProfilePage';
 
-import LoginForm from '../components/LoginForm';
-import RegisterForm from '../components/RegisterForm';
+import LoginForm from '../components/auth/LoginForm';
+import RegisterForm from '../components/auth/RegisterForm';
 
-import AdminDashboard from '../pages/AdminDashboard';
-import ManageRooms from '../pages/ManageRooms';
-import ManageBookings from '../pages/ManageBookings';
+import AdminDashboard from '../pages/admin/AdminDashboard';
+import ManageRooms from '../pages/admin/ManageRooms';
+import ManageBookings from '../pages/admin/ManageBookings';
 
-import ProtectedRoute from '../components/ProtectedRoute';
+import ProtectedRoute from './ProtectedRoute';
 
 const AppRouter = () => {
   return (

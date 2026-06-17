@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useBookingStore } from '../store/useBookingStore';
+import { Users, DollarSign } from 'lucide-react';
+import { useBookingStore } from '../../store/useBookingStore';
 
 const FilterBar = ({ onSearch }) => {
   const { checkIn, checkOut, guests, roomType, setSearchCriteria } = useBookingStore();

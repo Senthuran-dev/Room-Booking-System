@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import RoomGallery from '../components/RoomGallery';
-import BookingForm from '../components/BookingForm';
-import StarRating from '../components/StarRating';
+import RoomGallery from '../components/rooms/RoomGallery';
+import StarRating from '../components/shared/StarRating';
+import BookingForm from '../components/bookings/BookingForm';
 import { Wifi, Tv, Coffee } from 'lucide-react';
 
 const RoomDetailPage = () => {

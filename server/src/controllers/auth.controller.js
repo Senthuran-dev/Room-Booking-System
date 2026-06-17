@@ -1,17 +1,11 @@
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
-};
+const User = require('../models/User.model');
+const sendToken = require('../utils/sendToken');
 
 exports.register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
     const user = await User.create({ name, email, password });
-    const token = generateToken(user._id);
-    user.password = undefined; 
-    res.status(201).json({ success: true, token, user });
+    sendToken(user, 201, res);
   } catch (err) { next(err); }
 };
 
@@ -25,9 +19,7 @@ exports.login = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
-    const token = generateToken(user._id);
-    user.password = undefined;
-    res.status(200).json({ success: true, token, user });
+    sendToken(user, 200, res);
   } catch (err) { next(err); }
 };
 
@@ -54,7 +46,6 @@ exports.changePassword = async (req, res, next) => {
     }
     user.password = req.body.newPassword;
     await user.save();
-    const token = generateToken(user._id);
-    res.status(200).json({ success: true, token });
+    sendToken(user, 200, res);
   } catch (err) { next(err); }
 };

@@ -1,5 +1,6 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
-import FilterBar from '../components/FilterBar';
+import FilterBar from '../components/rooms/FilterBar';
 import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {

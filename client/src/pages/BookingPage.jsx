@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import BookingCard from '../components/BookingCard';
+import BookingCard from '../components/bookings/BookingCard';
 
 const BookingPage = () => {
   const [bookings, setBookings] = useState([]);

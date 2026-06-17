@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/useAuthStore';
-import { createBooking } from '../services/booking.service';
+import { useAuthStore } from '../../store/useAuthStore';
+import { createBooking } from '../../services/booking.service';
+import { Calendar, Users } from 'lucide-react';
 
 const BookingForm = ({ room }) => {
   const [checkIn, setCheckIn] = useState(null);
