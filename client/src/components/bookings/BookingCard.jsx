@@ -1,4 +1,9 @@
+import { useState } from 'react';
+import ReviewModal from '../shared/ReviewModal';
+
 const BookingCard = ({ booking, onCancel }) => {
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+
   const getStatusColor = (status) => {
     switch(status.toLowerCase()) {
       case 'confirmed': return 'bg-green-100 text-green-800';
@@ -58,7 +63,26 @@ const BookingCard = ({ booking, onCancel }) => {
             </button>
           </div>
         )}
+        
+        {booking.status === 'completed' && (
+          <div className="mt-auto pt-4 flex justify-end">
+            <button 
+              onClick={() => setIsReviewOpen(true)}
+              className="btn-primary py-1.5 px-4 text-sm"
+            >
+              Write a Review
+            </button>
+          </div>
+        )}
       </div>
+
+      <ReviewModal 
+        isOpen={isReviewOpen} 
+        onClose={() => setIsReviewOpen(false)} 
+        roomId={booking.room?._id}
+        roomName={booking.room?.name}
+        onSuccess={() => alert('Review submitted successfully!')}
+      />
     </div>
   );
 };

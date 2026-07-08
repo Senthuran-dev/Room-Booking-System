@@ -14,25 +14,22 @@ const BookingForm = ({ room }) => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleBooking = async () => {
+  const handleBooking = () => {
     if (!user) {
       navigate('/login');
       return;
     }
     if (!checkIn || !checkOut) return;
 
-    setLoading(true);
-    try {
-      // Mock for now until API is ready
-      // await createBooking({ roomId: room._id, checkIn, checkOut, guests });
-      setTimeout(() => {
-        navigate('/profile'); // Redirect to profile/bookings
-      }, 1000);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+    navigate(`/rooms/${room._id}/book`, {
+      state: {
+        room,
+        checkIn: checkIn.toISOString(),
+        checkOut: checkOut.toISOString(),
+        guests,
+        total: calculateTotal()
+      }
+    });
   };
 
   const calculateTotal = () => {

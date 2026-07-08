@@ -43,6 +43,13 @@ const AdminDashboard = () => {
                 <p className="text-sm text-gray-500">View and moderate all reservations</p>
               </div>
             </Link>
+            <Link to="/admin/users" className="flex items-center p-4 border rounded-lg hover:bg-slate-50 transition-colors">
+              <Users className="h-5 w-5 text-primary mr-3" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-[#1b1b1d]">Manage Users</h3>
+                <p className="text-sm text-gray-500">Promote admins and remove accounts</p>
+              </div>
+            </Link>
           </div>
         </div>
       </div>
