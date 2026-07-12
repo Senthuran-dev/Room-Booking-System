@@ -10,8 +10,12 @@ export default {
         primary: '#1A3C5E',
         'primary-dark': '#002645',
         accent: '#E8A045',
-        surface: '#F8F7F4',
+        surface: '#F8F7F4', // As per brand guidelines, not raw tokens
         'surface-elevated': '#FFFFFF',
+        'on-surface': '#1b1b1d',
+        'on-surface-variant': '#43474e',
+        'status-success': '#2D7D46',
+        'status-success-bg': '#e6f4ea',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

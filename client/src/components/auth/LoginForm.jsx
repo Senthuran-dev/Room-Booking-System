@@ -18,13 +18,9 @@ const LoginForm = () => {
     setLoading(true);
     
     try {
-      // Mock validation logic for early UI testing
-      // const data = await login(email, password);
-      // For now, let's just simulate a successful login to move quickly through UI
-      if (email && password) {
-        setAuth({ name: 'Demo User', email, role: 'user' }, 'mock-jwt-token');
-        navigate('/');
-      }
+      const data = await login(email, password);
+      setAuth(data.user, data.token); // sendToken wraps user in data
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to log in. Please check your credentials.');
     } finally {

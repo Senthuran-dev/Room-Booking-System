@@ -22,9 +22,10 @@ const ConfirmBookingPage = () => {
     try {
       await createBooking({
         room: room._id,
-        checkInDate: checkIn,
-        checkOutDate: checkOut,
-        guests
+        checkIn: checkIn,
+        checkOut: checkOut,
+        guests,
+        totalPrice: finalTotal
       });
       setSuccess(true);
       setTimeout(() => {

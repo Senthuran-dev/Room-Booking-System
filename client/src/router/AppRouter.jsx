@@ -25,7 +25,7 @@ const AppRouter = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="flex-1 bg-[#f4f7fb]">
+      <main className="flex-1 bg-surface">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/rooms" element={<RoomsPage />} />

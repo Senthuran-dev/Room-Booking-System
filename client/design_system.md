@@ -165,9 +165,17 @@ The shape language is "Rounded," striking a balance between the rigid profession
 ### Status Badges & Tags
 - **Status Pills:** Pill-shaped with a light tinted background and dark text (e.g., Confirmed uses a light green background with #2D7D46 text).
 - **Room Tags:** Small pills with a thin Primary Navy outline and Navy text; used for amenities like "Free WiFi" or "AC."
+- **Role Badges:** Admin uses blue-tinted pills (bg-blue-100 / text-blue-800); User uses neutral gray pills (bg-gray-100 / text-gray-800).
 
 ### Cards
 - Standard Room Card: Features a top-aligned image, 10px rounded corners, and the Level 1 shadow. Content should be padded by 20px (stack-lg equivalent) internally.
+- KPI Cards (Admin Dashboard): Horizontal layout with a colored icon container (blue, green, purple, orange tints) and vertically stacked label + value.
 
 ### Star Ratings
 - Displayed using the Accent color (#E8A045). Always paired with a numeric value in parentheses (e.g., ★ 4.8).
+
+### Modals
+- **ReviewModal:** Overlay modal for submitting room reviews. Contains a StarRating input, comment textarea, and submit/cancel buttons. Uses Level 2 elevation shadow with a semi-transparent backdrop.
+
+### Confirmation Pages
+- **ConfirmBookingPage:** Two-column layout (reservation details + price summary sidebar). Displays check-in/check-out dates, guest count, payment method indicator, itemized price breakdown with 15% tax, and a prominent "Complete Booking" CTA. Success state shows a CheckCircle animation with auto-redirect.

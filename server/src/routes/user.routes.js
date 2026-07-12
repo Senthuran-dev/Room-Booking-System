@@ -1,11 +1,12 @@
 const express = require('express');
 const { getUsers, updateUserRole, deleteUser } = require('../controllers/user.controller');
-const { protect, authorize } = require('../middleware/auth.middleware');
+const { protect } = require('../middleware/auth.middleware');
+const { adminOnly } = require('../middleware/admin.middleware');
 
 const router = express.Router();
 
 router.use(protect);
-router.use(authorize('admin'));
+router.use(adminOnly);
 
 router.route('/')
   .get(getUsers);

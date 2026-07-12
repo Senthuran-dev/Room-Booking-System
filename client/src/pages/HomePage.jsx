@@ -1,10 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import FilterBar from '../components/rooms/FilterBar';
 import { useNavigate } from 'react-router-dom';
+import { getRooms } from '../services/room.service';
+import RoomCard from '../components/rooms/RoomCard';
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const [featuredRooms, setFeaturedRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const res = await getRooms();
+        setFeaturedRooms(res.data?.slice(0, 3) || []);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRooms();
+  }, []);
 
   const handleSearch = () => {
     navigate('/rooms');
@@ -26,6 +44,17 @@ const HomePage = () => {
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <h2 className="text-3xl font-bold text-[#1b1b1d] mb-8 text-center">Featured Rooms</h2>
+        
+        {loading ? (
+          <div className="text-center py-10 text-gray-500">Loading featured rooms...</div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            {featuredRooms.map(room => (
+              <RoomCard key={room._id} room={room} />
+            ))}
+          </div>
+        )}
+
         <div className="text-center">
           <Link to="/rooms" className="btn-secondary inline-block">View All Rooms</Link>
         </div>

@@ -1,6 +1,7 @@
 require('dotenv').config({ path: __dirname + '/../../.env' });
 const mongoose = require('mongoose');
 const Room = require('../models/Room.model');
+const User = require('../models/User.model');
 const connectDB = require('../config/db');
 
 connectDB();
@@ -41,7 +42,16 @@ const rooms = [
 const importData = async () => {
   try {
     await Room.deleteMany();
+    await User.deleteMany();
+    
     await Room.insertMany(rooms);
+    await User.create({
+      name: 'Admin User',
+      email: 'admin@stayease.com',
+      password: 'password123',
+      role: 'admin'
+    });
+    
     console.log('✅ Data Imported Successfully!');
     process.exit();
   } catch (error) {
@@ -53,6 +63,7 @@ const importData = async () => {
 const destroyData = async () => {
   try {
     await Room.deleteMany();
+    await User.deleteMany();
     console.log('✅ Data Destroyed Successfully!');
     process.exit();
   } catch (error) {

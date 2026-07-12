@@ -16,5 +16,19 @@ export const useAuthStore = create((set) => ({
   logout: () => {
     localStorage.removeItem('token');
     set({ user: null, token: null });
+  },
+
+  // Rehydrate session on refresh
+  initAuth: async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const { getMe } = await import('../services/auth.service');
+      const data = await getMe();
+      set({ user: data.data, token });
+    } catch (err) {
+      localStorage.removeItem('token');
+      set({ user: null, token: null });
+    }
   }
 }));

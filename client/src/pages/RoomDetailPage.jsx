@@ -5,26 +5,27 @@ import StarRating from '../components/shared/StarRating';
 import BookingForm from '../components/bookings/BookingForm';
 import { Wifi, Tv, Coffee } from 'lucide-react';
 
+import { getRoomById } from '../services/room.service';
+
 const RoomDetailPage = () => {
   const { id } = useParams();
   const [room, setRoom] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    setRoom({
-      _id: id,
-      name: 'Executive Suite',
-      type: 'Suite',
-      description: 'Experience pure luxury in our Executive Suite. Featuring panoramic city views, a separate living area, and premium amenities to ensure your stay is perfect.',
-      capacity: 4,
-      pricePerNight: 450,
-      averageRating: 5.0,
-      amenities: ['Free WiFi', 'TV', 'Coffee Maker'],
-      images: [
-        { url: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80' },
-        { url: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80' }
-      ]
-    });
+    const fetchRoom = async () => {
+      try {
+        const res = await getRoomById(id);
+        setRoom(res.data);
+      } catch (err) {
+        console.error(err);
+        setError('Room not found');
+      }
+    };
+    fetchRoom();
   }, [id]);
+
+  if (error) return <div className="text-center py-20 text-red-500">{error}</div>;
 
   if (!room) return <div className="text-center py-20">Loading...</div>;
 

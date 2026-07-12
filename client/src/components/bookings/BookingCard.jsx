@@ -53,7 +53,7 @@ const BookingCard = ({ booking, onCancel }) => {
           </div>
         </div>
 
-        {booking.status === 'confirmed' && onCancel && (
+        {booking.status === 'Confirmed' && onCancel && (
           <div className="mt-auto pt-4 flex justify-end">
             <button 
               onClick={() => onCancel(booking._id)}
@@ -64,7 +64,7 @@ const BookingCard = ({ booking, onCancel }) => {
           </div>
         )}
         
-        {booking.status === 'completed' && (
+        {booking.status === 'Completed' && (
           <div className="mt-auto pt-4 flex justify-end">
             <button 
               onClick={() => setIsReviewOpen(true)}

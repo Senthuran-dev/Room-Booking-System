@@ -30,8 +30,10 @@ reviewSchema.post('save', function() {
   this.constructor.getAverageRating(this.room);
 });
 
-reviewSchema.pre('remove', function() {
-  this.constructor.getAverageRating(this.room);
+reviewSchema.post('findOneAndDelete', async function(doc) {
+  if (doc) {
+    await doc.constructor.getAverageRating(doc.room);
+  }
 });
 
 module.exports = mongoose.model('Review', reviewSchema);
