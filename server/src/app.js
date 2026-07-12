@@ -5,6 +5,7 @@ const roomRoutes = require('./routes/room.routes');
 const bookingRoutes = require('./routes/booking.routes');
 const userRoutes = require('./routes/user.routes');
 const reviewRoutes = require('./routes/review.routes');
+const analyticsRoutes = require('./routes/analytics.routes');
 const errorHandler = require('./utils/errorHandler');
 
 const app = express();
@@ -18,6 +19,7 @@ app.use('/api/v1/rooms', roomRoutes);
 app.use('/api/v1/bookings', bookingRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
+app.use('/api/v1/analytics', analyticsRoutes);
 
 app.use(errorHandler);
 

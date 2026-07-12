@@ -1,28 +1,33 @@
 import { useEffect, useState } from 'react';
 import BookingCard from '../components/bookings/BookingCard';
+import { getMyBookings, cancelBooking } from '../services/booking.service';
 
 const BookingPage = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock fetch
-    setBookings([
-      {
-        _id: 'bk_12345',
-        status: 'Confirmed',
-        checkIn: new Date(Date.now() + 86400000 * 5),
-        checkOut: new Date(Date.now() + 86400000 * 8),
-        guests: 2,
-        totalPrice: 450,
-        room: { name: 'Standard Double Room', images: [{ url: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&q=80' }] }
-      }
-    ]);
-    setLoading(false);
+    fetchBookings();
   }, []);
 
-  const handleCancel = (id) => {
-    setBookings(bookings.map(b => b._id === id ? { ...b, status: 'Cancelled' } : b));
+  const fetchBookings = async () => {
+    try {
+      const res = await getMyBookings();
+      setBookings(res.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = async (id) => {
+    try {
+      await cancelBooking(id);
+      fetchBookings(); // refresh the list
+    } catch (error) {
+      alert('Failed to cancel booking');
+    }
   };
 
   return (

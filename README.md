@@ -1,12 +1,12 @@
 # StayEase Room Booking System
 
-A full-stack MERN web application that enables users to search, browse, and book hotel rooms online. The platform delivers a seamless guest experience for discovering available rooms and completing reservations, while providing hotel administrators with a powerful dashboard for managing inventory, bookings, and revenue analytics.
+A full-stack MERN web application that enables users to search, browse, and book hotel rooms online. The platform delivers a seamless guest experience for discovering available rooms and completing reservations, while providing hotel administrators with a powerful dashboard for managing inventory, bookings, revenue analytics, and user accounts.
 
 ## Tech Stack
 
-- **Presentation Layer:** React.js 18 (Vite), Tailwind CSS, Zustand
-- **Application Layer:** Node.js v20, Express.js v4, RESTful API
-- **Data Layer:** MongoDB Atlas, Mongoose v8 ORM
+- **Presentation Layer:** React.js 19 (Vite 8), Tailwind CSS 3, Zustand 5
+- **Application Layer:** Node.js v20, Express.js v5, RESTful API
+- **Data Layer:** MongoDB Atlas, Mongoose v9 ORM
 - **Media Storage:** Cloudinary CDN
 - **Auth:** JWT (jsonwebtoken) + bcrypt.js
 
@@ -35,6 +35,23 @@ graph TD
     end
 ```
 
+## Key Features
+
+### Guest Features
+- Browse, search, and filter rooms by type, capacity, price, and availability dates
+- View room galleries, amenities, ratings, and detailed descriptions
+- Book rooms with date selection, price calculation (including 15% tax), and a dedicated confirmation page
+- View booking history with status tracking and cancellation
+- Rate and review rooms after completing a stay (via review modal)
+- Update profile and change password
+
+### Admin Features
+- Dashboard with real-time analytics (daily bookings, monthly revenue, occupancy rate, total users)
+- Full CRUD room management with Cloudinary image uploads
+- Booking management with status workflow (Pending → Confirmed → Completed / Cancelled)
+- User management (view all users, promote/demote roles, delete accounts)
+- Review moderation (delete inappropriate reviews)
+
 ## Setup Instructions
 
 ### Prerequisites
@@ -43,12 +60,17 @@ graph TD
 - Cloudinary account for media storage
 
 ### Environment Variables
-You will need to create a `.env` file in the root of the `/server` directory and add the following keys once set up:
-- `MONGO_URI`
-- `JWT_SECRET`
-- `CLOUDINARY_CLOUD_NAME`
-- `CLOUDINARY_API_KEY`
-- `CLOUDINARY_API_SECRET`
+
+**Server** (`/server/.env`):
+- `MONGODB_URI` - MongoDB Atlas connection string
+- `JWT_SECRET` - Secret key for signing JWT tokens
+- `CLOUDINARY_CLOUD_NAME` - Cloudinary cloud name
+- `CLOUDINARY_API_KEY` - Cloudinary API key
+- `CLOUDINARY_API_SECRET` - Cloudinary API secret
+- `PORT` - Server port (default: `5000`)
+
+**Client** (`/client/.env`):
+- `VITE_API_URL` - API base URL (default: `http://localhost:5000/api/v1`)
 
 ### Installation
 
@@ -67,3 +89,10 @@ You will need to create a `.env` file in the root of the `/server` directory and
 3. Start the application:
    - For backend: `npm run dev` in the `/server` directory
    - For frontend: `npm run dev` in the `/client` directory
+
+4. (Optional) Seed the database:
+   ```bash
+   cd server
+   node src/utils/seeder.js        # Import sample rooms
+   node src/utils/seeder.js -d     # Destroy all rooms
+   ```

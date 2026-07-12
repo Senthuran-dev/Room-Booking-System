@@ -6,7 +6,7 @@ export const createBooking = async (bookingData) => {
 };
 
 export const getMyBookings = async () => {
-  const response = await api.get('/bookings/me');
+  const response = await api.get('/bookings/my');
   return response.data;
 };
 

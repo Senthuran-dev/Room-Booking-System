@@ -20,11 +20,10 @@ const RegisterForm = () => {
     setLoading(true);
     
     try {
-      // Mock for early UI
-      if (formData.email) {
-        setAuth({ name: formData.name, email: formData.email, role: 'user' }, 'mock-jwt-token');
-        navigate('/');
-      }
+      const { name, email, password } = formData;
+      const data = await register({ name, email, password });
+      setAuth(data.user, data.token);
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to register.');
     } finally {
