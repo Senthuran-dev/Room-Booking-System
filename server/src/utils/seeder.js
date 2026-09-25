@@ -45,10 +45,17 @@ const importData = async () => {
     await User.deleteMany();
     
     await Room.insertMany(rooms);
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminEmail || !adminPassword) {
+      throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD are required');
+    }
+
     await User.create({
       name: 'Admin User',
-      email: 'admin@stayease.com',
-      password: 'password123',
+      email: adminEmail,
+      password: adminPassword,
       role: 'admin'
     });
     

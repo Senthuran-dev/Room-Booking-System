@@ -10,10 +10,20 @@ const errorHandler = require('./utils/errorHandler');
 
 const app = express();
 
-app.use(cors());
+const frontendUrl = process.env.FRONTEND_URL;
+app.use(
+  cors({
+    origin: frontendUrl,
+    credentials: false
+  })
+);
 app.use(express.json());
 
 // Routes
+app.get('/api/v1/health', (req, res) => {
+  res.status(200).json({ success: true, status: 'ok', service: 'stayease-api' });
+});
+
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/rooms', roomRoutes);
 app.use('/api/v1/bookings', bookingRoutes);

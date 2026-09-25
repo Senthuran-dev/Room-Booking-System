@@ -44,7 +44,7 @@ exports.getAnalytics = async (req, res, next) => {
       data: {
         bookingsToday,
         monthlyRevenue,
-        occupancyRate: occupancyRate > 0 ? occupancyRate : 78, // fallback for demo if 0
+        occupancyRate,
         totalUsers
       }
     });
