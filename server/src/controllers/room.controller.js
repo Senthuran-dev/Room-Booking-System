@@ -6,7 +6,29 @@ const streamifier = require('streamifier');
 
 exports.getRooms = async (req, res, next) => {
   try {
-    const features = new APIFeatures(Room.find(), req.query).filter().sort().paginate();
+    let query = Room.find();
+
+    if (req.query.checkIn && req.query.checkOut) {
+      const checkIn = new Date(req.query.checkIn);
+      const checkOut = new Date(req.query.checkOut);
+
+      if (!Number.isNaN(checkIn.getTime()) && !Number.isNaN(checkOut.getTime())) {
+        const overlappingBookings = await Booking.find({
+          status: { $in: ['Pending', 'Confirmed'] },
+          $or: [
+            { checkIn: { $lt: checkOut }, checkOut: { $gt: checkIn } }
+          ]
+        });
+
+        const bookedRoomIds = overlappingBookings.map(b => b.room);
+        query = query.find({ _id: { $nin: bookedRoomIds } });
+      }
+      
+      delete req.query.checkIn;
+      delete req.query.checkOut;
+    }
+
+    const features = new APIFeatures(query, req.query).filter().sort().paginate();
     const rooms = await features.query;
     res.status(200).json({ success: true, count: rooms.length, data: rooms });
   } catch (err) { next(err); }
