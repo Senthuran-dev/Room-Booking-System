@@ -32,12 +32,14 @@ exports.getAnalytics = async (req, res, next) => {
     ]);
     const monthlyRevenue = revenueAggregation[0]?.totalRevenue || 0;
 
-    // Occupancy calculation (mocked based on total bookings vs rooms capacity for simplicity, or just return a static nice number for the demo)
-    // A real system would check overlapping dates. For now, let's just base it on active bookings.
-    const activeBookings = await Booking.countDocuments({
-      status: { $in: ['Confirmed', 'Completed'] }
+    // True occupancy calculation for today
+    const now = new Date();
+    const activeTodayBookings = await Booking.countDocuments({
+      status: { $in: ['Confirmed', 'Completed'] },
+      checkIn: { $lte: now },
+      checkOut: { $gt: now }
     });
-    const occupancyRate = totalRooms > 0 ? Math.min(Math.round((activeBookings / (totalRooms * 30)) * 100), 100) : 0; 
+    const occupancyRate = totalRooms > 0 ? Math.round((activeTodayBookings / totalRooms) * 100) : 0; 
 
     res.status(200).json({
       success: true,

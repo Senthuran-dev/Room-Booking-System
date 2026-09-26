@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { User } from 'lucide-react';
+import api from '../services/api';
 
 const ProfilePage = () => {
   const { user, setAuth, token } = useAuthStore();
@@ -9,12 +10,16 @@ const ProfilePage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setAuth({ ...user, name: formData.name }, token);
+    try {
+      const res = await api.put('/auth/me', { name: formData.name });
+      setAuth(res.data.data, token);
+      alert('Profile updated successfully');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to update profile');
+    } finally {
       setLoading(false);
-      alert('Profile updated successfully (Mocked)');
-    }, 1000);
+    }
   };
 
   return (
