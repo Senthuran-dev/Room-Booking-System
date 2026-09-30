@@ -1,11 +1,25 @@
+const mongoose = require('mongoose');
 const Booking = require('../models/Booking.model');
 const Room = require('../models/Room.model');
 
 exports.createBooking = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
     req.body.user = req.user.id;
-    const room = await Room.findById(req.body.room);
-    if (!room) return res.status(404).json({ success: false, message: 'Room not found' });
+    
+    // Acquire explicit write lock on the room by updating a field
+    const room = await Room.findOneAndUpdate(
+      { _id: req.body.room },
+      { $set: { __lastBookingAttempt: new Date() } },
+      { new: true, session }
+    );
+
+    if (!room) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ success: false, message: 'Room not found' });
+    }
     
     // Validate dates
     const checkIn = new Date(req.body.checkIn);
@@ -15,11 +29,15 @@ exports.createBooking = async (req, res, next) => {
       Number.isNaN(checkOut.getTime()) ||
       checkOut <= checkIn
     ) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({ success: false, message: 'Invalid booking dates' });
     }
 
     // Validate capacity
     if (req.body.guests > room.capacity) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({ success: false, message: `Maximum capacity is ${room.capacity} guests` });
     }
 
@@ -34,22 +52,31 @@ exports.createBooking = async (req, res, next) => {
       $or: [
         { checkIn: { $lt: new Date(req.body.checkOut) }, checkOut: { $gt: new Date(req.body.checkIn) } }
       ]
-    });
+    }).session(session);
     
     if (overlapping.length > 0) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({ success: false, message: 'Room is already booked for these dates' });
     }
 
-    const booking = await Booking.create({
+    const booking = await Booking.create([{
       user: req.user.id,
       room: room._id,
       checkIn: req.body.checkIn,
       checkOut: req.body.checkOut,
       guests: req.body.guests,
       totalPrice
-    });
-    res.status(201).json({ success: true, data: booking });
-  } catch (err) { next(err); }
+    }], { session });
+
+    await session.commitTransaction();
+    session.endSession();
+    res.status(201).json({ success: true, data: booking[0] });
+  } catch (err) { 
+    await session.abortTransaction();
+    session.endSession();
+    next(err); 
+  }
 };
 
 exports.getMyBookings = async (req, res, next) => {
