@@ -38,3 +38,8 @@ export const deleteRoom = async (id) => {
   const response = await api.delete(`/rooms/${id}`);
   return response.data;
 };
+
+export const deleteRoomImage = async (roomId, imgId) => {
+  const response = await api.delete(`/rooms/${roomId}/images/${imgId}`);
+  return response.data;
+};
