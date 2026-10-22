@@ -1,6 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { getRooms, createRoom, updateRoom, deleteRoom } from '../../services/room.service';
-import { Plus, Edit2, Trash2, X, Image as ImageIcon, Users, Check, AlertCircle } from 'lucide-react';
+import { 
+  getRooms, 
+  createRoom, 
+  updateRoom, 
+  deleteRoom, 
+  uploadRoomImages, 
+  deleteRoomImage 
+} from '../../services/room.service';
+import { 
+  Plus, 
+  Edit2, 
+  Trash2, 
+  X, 
+  Image as ImageIcon, 
+  Users, 
+  Check, 
+  AlertCircle, 
+  UploadCloud, 
+  Loader2 
+} from 'lucide-react';
 
 const COMMON_AMENITIES = [
   'Free WiFi',
@@ -33,7 +51,10 @@ const ManageRooms = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
   const [formData, setFormData] = useState(INITIAL_FORM);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [filePreviews, setFilePreviews] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [submitStatusText, setSubmitStatusText] = useState('');
   const [error, setError] = useState('');
   const [customAmenity, setCustomAmenity] = useState('');
 
@@ -55,7 +76,10 @@ const ManageRooms = () => {
   const openCreateModal = () => {
     setEditingRoom(null);
     setFormData(INITIAL_FORM);
+    setSelectedFiles([]);
+    setFilePreviews([]);
     setError('');
+    setSubmitStatusText('');
     setModalOpen(true);
   };
 
@@ -68,9 +92,12 @@ const ManageRooms = () => {
       capacity: room.capacity || 2,
       description: room.description || '',
       amenities: room.amenities || [],
-      imageUrl: room.images?.[0]?.url || ''
+      imageUrl: ''
     });
+    setSelectedFiles([]);
+    setFilePreviews([]);
     setError('');
+    setSubmitStatusText('');
     setModalOpen(true);
   };
 
@@ -78,7 +105,46 @@ const ManageRooms = () => {
     if (submitting) return;
     setModalOpen(false);
     setEditingRoom(null);
+    setSelectedFiles([]);
+    setFilePreviews([]);
     setError('');
+  };
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    if (files.length + selectedFiles.length > 5) {
+      setError('You can upload up to 5 images at a time.');
+      return;
+    }
+
+    const newFiles = [...selectedFiles, ...files];
+    setSelectedFiles(newFiles);
+
+    const newPreviews = files.map(file => URL.createObjectURL(file));
+    setFilePreviews(prev => [...prev, ...newPreviews]);
+  };
+
+  const removeSelectedFile = (index) => {
+    URL.revokeObjectURL(filePreviews[index]);
+    setSelectedFiles(prev => prev.filter((_, idx) => idx !== index));
+    setFilePreviews(prev => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleDeleteExistingImage = async (imgId) => {
+    if (!editingRoom) return;
+    if (!window.confirm('Delete this image from Cloudinary and this room?')) return;
+
+    try {
+      await deleteRoomImage(editingRoom._id, imgId);
+      const updatedImages = editingRoom.images.filter(img => img._id !== imgId);
+      setEditingRoom(prev => ({ ...prev, images: updatedImages }));
+      setRooms(prev => prev.map(r => r._id === editingRoom._id ? { ...r, images: updatedImages } : r));
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete image from Cloudinary');
+    }
   };
 
   const handleToggleAmenity = (amenity) => {
@@ -121,6 +187,7 @@ const ManageRooms = () => {
     }
 
     setSubmitting(true);
+    setSubmitStatusText('Saving room details...');
 
     try {
       const payload = {
@@ -129,25 +196,44 @@ const ManageRooms = () => {
         pricePerNight: Number(formData.pricePerNight),
         capacity: Number(formData.capacity),
         description: formData.description.trim(),
-        amenities: formData.amenities,
-        images: formData.imageUrl.trim() 
-          ? [{ url: formData.imageUrl.trim(), public_id: `custom_${Date.now()}` }]
-          : (editingRoom?.images || [])
+        amenities: formData.amenities
       };
+
+      // If an external image URL was provided
+      if (formData.imageUrl.trim()) {
+        payload.images = [
+          ...(editingRoom?.images || []),
+          { url: formData.imageUrl.trim(), public_id: `custom_${Date.now()}` }
+        ];
+      }
+
+      let savedRoomId = editingRoom?._id;
 
       if (editingRoom) {
         await updateRoom(editingRoom._id, payload);
       } else {
-        await createRoom(payload);
+        const createRes = await createRoom(payload);
+        savedRoomId = createRes.data?._id;
+      }
+
+      // If user selected image files, upload directly to Cloudinary
+      if (selectedFiles.length > 0 && savedRoomId) {
+        setSubmitStatusText(`Uploading ${selectedFiles.length} image(s) to Cloudinary...`);
+        const uploadData = new FormData();
+        selectedFiles.forEach(file => {
+          uploadData.append('images', file);
+        });
+        await uploadRoomImages(savedRoomId, uploadData);
       }
 
       await fetchRooms();
-      setModalOpen(false);
+      closeModal();
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || 'Failed to save room. Please try again.');
     } finally {
       setSubmitting(false);
+      setSubmitStatusText('');
     }
   };
 
@@ -170,7 +256,7 @@ const ManageRooms = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-[#1b1b1d] tracking-tight">Manage Rooms</h1>
-          <p className="text-sm text-gray-500 mt-1">Add, update, or remove hotel suites and room listings.</p>
+          <p className="text-sm text-gray-500 mt-1">Create, update, upload Cloudinary photos, and manage hotel room listings.</p>
         </div>
         <button 
           onClick={openCreateModal}
@@ -192,7 +278,7 @@ const ManageRooms = () => {
             </div>
             <h3 className="text-lg font-semibold text-gray-800">No rooms listed yet</h3>
             <p className="text-sm text-gray-500 max-w-sm mx-auto mt-1 mb-6">
-              Get started by creating your first room with pricing, capacity, and amenities.
+              Get started by creating your first room with pricing, capacity, and Cloudinary photos.
             </p>
             <button onClick={openCreateModal} className="btn-primary py-2 px-4">
               Create First Room
@@ -207,7 +293,7 @@ const ManageRooms = () => {
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Type</th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Capacity</th>
                   <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Price / Night</th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Amenities</th>
+                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Photos</th>
                   <th className="px-6 py-3.5 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
@@ -253,19 +339,8 @@ const ManageRooms = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                       ${room.pricePerNight}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-wrap gap-1 max-w-xs">
-                        {room.amenities?.slice(0, 3).map((amenity, idx) => (
-                          <span key={idx} className="text-[11px] bg-slate-100 text-gray-600 px-2 py-0.5 rounded">
-                            {amenity}
-                          </span>
-                        ))}
-                        {(room.amenities?.length || 0) > 3 && (
-                          <span className="text-[11px] bg-slate-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">
-                            +{room.amenities.length - 3}
-                          </span>
-                        )}
-                      </div>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {room.images?.length || 0} photo{(room.images?.length || 0) === 1 ? '' : 's'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button 
@@ -327,7 +402,7 @@ const ManageRooms = () => {
                   type="text" 
                   value={formData.name}
                   onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g. Presidential Ocean Suite"
+                  placeholder="e.g. Royal Ocean Suite"
                   className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
                   required
                 />
@@ -390,34 +465,92 @@ const ManageRooms = () => {
                   rows={3}
                   value={formData.description}
                   onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Describe the room, view, ambiance, and special features..."
+                  placeholder="Describe the room, ambiance, view, and unique hospitality features..."
                   className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
                   required
                 />
               </div>
 
-              {/* Image URL with Preview */}
+              {/* Cloudinary Image Upload Section */}
               <div>
                 <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
-                  Room Image URL
+                  Upload Room Photos to Cloudinary (up to 5)
                 </label>
-                <input 
-                  type="url" 
-                  value={formData.imageUrl}
-                  onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
-                  placeholder="https://images.unsplash.com/photo-..."
-                  className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
-                />
-                {formData.imageUrl && (
-                  <div className="mt-2 relative w-full h-36 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
-                    <img 
-                      src={formData.imageUrl} 
-                      alt="Room Preview" 
-                      className="w-full h-full object-cover" 
-                      onError={(e) => { e.target.style.display = 'none'; }}
-                    />
+                
+                {/* Drag and Drop / Click File Selector */}
+                <label className="flex flex-col items-center justify-center w-full h-32 px-4 border-2 border-dashed border-gray-300 hover:border-primary rounded-xl cursor-pointer bg-slate-50/60 hover:bg-blue-50/30 transition-colors">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <UploadCloud className="w-8 h-8 text-primary mb-2" />
+                    <p className="text-xs text-gray-600 font-medium">
+                      <span className="font-semibold text-primary">Click to choose photos</span> or drag & drop
+                    </p>
+                    <p className="text-[11px] text-gray-400 mt-1">PNG, JPG, WEBP up to 5MB each</p>
+                  </div>
+                  <input 
+                    type="file" 
+                    multiple 
+                    accept="image/*" 
+                    onChange={handleFileChange} 
+                    className="hidden" 
+                    disabled={submitting}
+                  />
+                </label>
+
+                {/* New File Previews */}
+                {filePreviews.length > 0 && (
+                  <div className="mt-3">
+                    <div className="text-xs font-medium text-gray-600 mb-2">Selected for upload:</div>
+                    <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                      {filePreviews.map((previewUrl, idx) => (
+                        <div key={idx} className="relative group rounded-lg overflow-hidden border border-gray-200 h-16">
+                          <img src={previewUrl} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => removeSelectedFile(idx)}
+                            className="absolute top-1 right-1 bg-black/60 hover:bg-red-600 text-white rounded-full p-0.5 transition-colors"
+                            title="Remove"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
+
+                {/* Existing Images (when Editing) */}
+                {editingRoom?.images?.length > 0 && (
+                  <div className="mt-4 pt-3 border-t border-gray-100">
+                    <div className="text-xs font-medium text-gray-600 mb-2">Existing Cloudinary Photos:</div>
+                    <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                      {editingRoom.images.map(img => (
+                        <div key={img._id} className="relative group rounded-lg overflow-hidden border border-gray-200 h-16">
+                          <img src={img.url} alt="Room" className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteExistingImage(img._id)}
+                            className="absolute top-1 right-1 bg-black/60 hover:bg-red-600 text-white rounded-full p-0.5 transition-colors opacity-90 group-hover:opacity-100"
+                            title="Delete from Cloudinary"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Optional External Image URL input */}
+                <div className="mt-3">
+                  <span className="text-[11px] text-gray-500">Or paste an image URL:</span>
+                  <input 
+                    type="url" 
+                    value={formData.imageUrl}
+                    onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
+                    placeholder="https://images.unsplash.com/photo-..."
+                    className="w-full mt-1 px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-primary"
+                  />
+                </div>
               </div>
 
               {/* Amenities Selection */}
@@ -435,7 +568,7 @@ const ManageRooms = () => {
                         onClick={() => handleToggleAmenity(amenity)}
                         className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 ${
                           isSelected 
-                            ? 'bg-primary text-white' 
+                            ? 'bg-primary text-white shadow-sm' 
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
@@ -466,22 +599,32 @@ const ManageRooms = () => {
               </div>
 
               {/* Modal Footer / Actions */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                <button 
-                  type="button" 
-                  onClick={closeModal}
-                  disabled={submitting}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  disabled={submitting}
-                  className="btn-primary py-2 px-5 text-sm flex items-center gap-2"
-                >
-                  {submitting ? 'Saving...' : editingRoom ? 'Update Room' : 'Create Room'}
-                </button>
+              <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                <div className="text-xs text-primary font-medium">
+                  {submitting && (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin text-accent" />
+                      {submitStatusText}
+                    </span>
+                  )}
+                </div>
+                <div className="flex gap-3">
+                  <button 
+                    type="button" 
+                    onClick={closeModal}
+                    disabled={submitting}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    disabled={submitting}
+                    className="btn-primary py-2 px-5 text-sm flex items-center gap-2"
+                  >
+                    {submitting ? 'Uploading & Saving...' : editingRoom ? 'Update Room' : 'Create Room'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
