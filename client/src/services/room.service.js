@@ -11,15 +11,24 @@ export const getRoomById = async (id) => {
 };
 
 // Admin routes
-export const createRoom = async (formData) => {
-  const response = await api.post('/rooms', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
+export const createRoom = async (data) => {
+  const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+  const response = await api.post('/rooms', data, {
+    headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : { 'Content-Type': 'application/json' }
   });
   return response.data;
 };
 
-export const updateRoom = async (id, formData) => {
-  const response = await api.put(`/rooms/${id}`, formData, {
+export const updateRoom = async (id, data) => {
+  const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+  const response = await api.put(`/rooms/${id}`, data, {
+    headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : { 'Content-Type': 'application/json' }
+  });
+  return response.data;
+};
+
+export const uploadRoomImages = async (id, formData) => {
+  const response = await api.post(`/rooms/${id}/images`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   });
   return response.data;
