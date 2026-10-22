@@ -12,6 +12,9 @@ const errorHandler = require('./utils/errorHandler');
 
 const app = express();
 
+// Trust reverse proxy (required for Render, Heroku, etc. so rate-limiter gets the real client IP)
+app.set('trust proxy', 1);
+
 // Security Middleware
 app.use(helmet());
 const limiter = rateLimit({
