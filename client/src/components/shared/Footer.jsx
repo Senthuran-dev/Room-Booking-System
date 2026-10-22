@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import Logo from './Logo';
 
 const Footer = () => {
   return (
@@ -6,7 +7,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
-            <span className="text-2xl font-bold tracking-tight">StayEase</span>
+            <Logo size={40} variant="light" textClassName="text-2xl" />
             <p className="mt-4 text-[#a9c9f2] text-sm max-w-sm leading-relaxed">
               Experience the best in hospitality. We provide seamless room booking for travelers who value efficiency, clarity, and comfort.
             </p>

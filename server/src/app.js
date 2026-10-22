@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const authRoutes = require('./routes/auth.routes');
 const roomRoutes = require('./routes/room.routes');
 const bookingRoutes = require('./routes/booking.routes');
@@ -9,6 +11,15 @@ const analyticsRoutes = require('./routes/analytics.routes');
 const errorHandler = require('./utils/errorHandler');
 
 const app = express();
+
+// Security Middleware
+app.use(helmet());
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.'
+});
+app.use('/api', limiter);
 
 const frontendUrl = process.env.FRONTEND_URL;
 app.use(

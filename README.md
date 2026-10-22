@@ -5,7 +5,7 @@ A full-stack MERN web application that enables users to search, browse, and book
 ## Tech Stack
 
 - **Presentation Layer:** React.js 19 (Vite 8), Tailwind CSS 3, Zustand 5
-- **Application Layer:** Node.js v20, Express.js v5, RESTful API
+- **Application Layer:** Node.js 22.x, Express.js v5, RESTful API
 - **Data Layer:** MongoDB Atlas, Mongoose v9 ORM
 - **Media Storage:** Cloudinary CDN
 - **Auth:** JWT (jsonwebtoken) + bcrypt.js
@@ -35,6 +35,37 @@ graph TD
     end
 ```
 
+## 📁 Project Structure
+
+```text
+C:\GITHUB\ROOM BOOKING SYSTEM
+├── client (Frontend - React + Vite)
+│   ├── src
+│   │   ├── assets
+│   │   ├── components
+│   │   ├── pages
+│   │   ├── router
+│   │   ├── services
+│   │   └── store
+│   └── design_system.md
+└── server (Backend - Express + MongoDB)
+    ├── src
+    │   ├── config
+    │   ├── controllers
+    │   ├── middleware
+    │   ├── models
+    │   ├── routes
+    │   └── utils
+    └── .env
+```
+
+## 🎨 Design System
+
+The platform utilizes a structured design system focused on **Hospitality Excellence**:
+- **Colors**: Deep navy (`#1A3C5E`) for authority and warm amber (`#E8A045`) for accents.
+- **Typography**: Inter (Google Fonts) for clean, functional data density.
+- **Elevation**: Tonal layers and ambient shadows for depth (Cards use a `0px 2px 8px` shadow).
+
 ## Key Features
 
 ### Guest Features
@@ -52,10 +83,15 @@ graph TD
 - User management (view all users, promote/demote roles, delete accounts)
 - Review moderation (delete inappropriate reviews)
 
+### Security & Reliability
+- **Concurrency Control:** Utilizes MongoDB transactions and explicit write locks to guarantee zero double-bookings under concurrent load.
+- **Security Middleware:** Implements `helmet` for robust HTTP header security and `express-rate-limit` to mitigate brute-force and DoS attacks.
+- **Render Wake-up:** Free-tier cold-start wake-up strategy implemented via automatic `/health` ping on frontend load.
+
 ## Setup Instructions
 
 ### Prerequisites
-- Node.js v20+
+- Node.js 22.x
 - MongoDB Atlas free-tier M0 cluster account
 - Cloudinary account for media storage
 

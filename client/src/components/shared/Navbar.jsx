@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import { LogOut, User, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import Logo from './Logo';
 
 const Navbar = () => {
   const { user, logout } = useAuthStore();
@@ -18,8 +19,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-primary font-bold text-xl tracking-tight">StayEase</span>
+            <Link to="/" className="flex-shrink-0 flex items-center group">
+              <Logo size={36} variant="dark" />
             </Link>
             <div className="hidden md:ml-6 md:flex md:space-x-8">
               <Link to="/rooms" className="text-[#1b1b1d] hover:text-primary px-3 py-2 text-sm font-medium transition-colors">Rooms</Link>
