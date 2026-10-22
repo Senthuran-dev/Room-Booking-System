@@ -4,6 +4,7 @@ import FilterBar from '../components/rooms/FilterBar';
 import { useNavigate } from 'react-router-dom';
 import { getRooms } from '../services/room.service';
 import RoomCard from '../components/rooms/RoomCard';
+import heroImg from '../assets/hero-landing.jpg';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ const HomePage = () => {
     <div className="flex flex-col min-h-screen">
       <div className="relative bg-primary h-[500px] flex items-center justify-center">
         <div className="absolute inset-0 overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1542314831-c6a4d27d66f6?auto=format&fit=crop&q=80" alt="Hero" className="w-full h-full object-cover opacity-30" />
+          <img src={heroImg} alt="Luxury hotel with ocean view" className="w-full h-full object-cover opacity-30" />
         </div>
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto w-full">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">Find Your Perfect Stay</h1>
