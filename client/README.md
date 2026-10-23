@@ -44,7 +44,7 @@ src/
 ├── services/
 │   ├── api.js                  # Axios instance + request/response interceptors
 │   ├── auth.service.js         # login, register, getMe, updateProfile
-│   ├── room.service.js         # getRooms, getRoomById, createRoom, updateRoom, deleteRoom
+│   ├── room.service.js         # getRooms (query strings, URLSearchParams, objects), getRoomById, createRoom, updateRoom, deleteRoom, uploadRoomImages, deleteRoomImage
 │   ├── booking.service.js      # createBooking, getMyBookings, cancelBooking, getAllBookings, updateBookingStatus
 │   ├── review.service.js       # createReview
 │   ├── analytics.service.js    # getAnalytics (admin dashboard KPIs)
@@ -55,12 +55,13 @@ src/
 │   │   ├── Navbar.jsx          # Responsive nav with auth-aware menu
 │   │   ├── Footer.jsx          # 4-column footer layout
 │   │   ├── StarRating.jsx      # Interactive/read-only star rating
-│   │   └── ReviewModal.jsx     # Modal for submitting room reviews
+│   │   ├── ReviewModal.jsx     # Modal for submitting room reviews
+│   │   └── AmenityIcon.jsx     # Dedicated Lucide icon mapping and chips for all amenities
 │   ├── auth/
 │   │   ├── LoginForm.jsx       # Login form with error handling
 │   │   └── RegisterForm.jsx    # Register with password confirmation
 │   ├── rooms/
-│   │   ├── FilterBar.jsx       # Search: dates, guests, type, price range
+│   │   ├── FilterBar.jsx       # Search: dates, guests, type, reset button
 │   │   ├── RoomCard.jsx        # Room preview card
 │   │   └── RoomGallery.jsx     # Image carousel with dot navigation
 │   └── bookings/
@@ -69,15 +70,15 @@ src/
 │
 └── pages/
     ├── HomePage.jsx            # Hero section + search bar
-    ├── RoomsPage.jsx           # Room grid listing with filters
-    ├── RoomDetailPage.jsx      # Room detail: gallery, amenities, booking
+    ├── RoomsPage.jsx           # Room grid listing with filters, empty state recovery, and results counter
+    ├── RoomDetailPage.jsx      # Room detail: gallery, full amenities with icons, booking
     ├── ConfirmBookingPage.jsx  # Booking confirmation with tax calculation
     ├── BookingPage.jsx         # User's booking list
     ├── ProfilePage.jsx         # Profile editor
     ├── NotFoundPage.jsx        # 404 error page
     └── admin/
         ├── AdminDashboard.jsx  # KPI cards + quick actions
-        ├── ManageRooms.jsx     # Room CRUD table
+        ├── ManageRooms.jsx     # Room CRUD table, photo uploader, interactive preview modal & image lightbox
         ├── ManageBookings.jsx  # Booking management table
         └── ManageUsers.jsx     # User role & account management
 ```

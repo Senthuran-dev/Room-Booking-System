@@ -7,10 +7,12 @@ const streamifier = require('streamifier');
 exports.getRooms = async (req, res, next) => {
   try {
     let query = Room.find();
+    const queryParams = { ...req.query };
 
-    if (req.query.checkIn && req.query.checkOut) {
-      const checkIn = new Date(req.query.checkIn);
-      const checkOut = new Date(req.query.checkOut);
+    // Check-in and check-out availability filtering
+    if (queryParams.checkIn && queryParams.checkOut) {
+      const checkIn = new Date(queryParams.checkIn);
+      const checkOut = new Date(queryParams.checkOut);
 
       if (!Number.isNaN(checkIn.getTime()) && !Number.isNaN(checkOut.getTime())) {
         const overlappingBookings = await Booking.find({
@@ -24,11 +26,50 @@ exports.getRooms = async (req, res, next) => {
         query = query.find({ _id: { $nin: bookedRoomIds } });
       }
       
-      delete req.query.checkIn;
-      delete req.query.checkOut;
+      delete queryParams.checkIn;
+      delete queryParams.checkOut;
     }
 
-    const features = new APIFeatures(query, req.query).filter().sort().paginate();
+    // Support minPrice and maxPrice query parameters
+    if (queryParams.minPrice !== undefined || queryParams.maxPrice !== undefined) {
+      queryParams.pricePerNight = queryParams.pricePerNight || {};
+      if (queryParams.minPrice !== undefined && queryParams.minPrice !== '') {
+        const minP = Number(queryParams.minPrice);
+        if (!Number.isNaN(minP)) queryParams.pricePerNight.gte = minP;
+      }
+      if (queryParams.maxPrice !== undefined && queryParams.maxPrice !== '') {
+        const maxP = Number(queryParams.maxPrice);
+        if (!Number.isNaN(maxP)) queryParams.pricePerNight.lte = maxP;
+      }
+      delete queryParams.minPrice;
+      delete queryParams.maxPrice;
+    }
+
+    // Support guests capacity (minimum capacity needed to accommodate guests)
+    if (queryParams.capacity !== undefined && queryParams.capacity !== '') {
+      const cap = Number(queryParams.capacity);
+      if (!Number.isNaN(cap) && cap > 0) {
+        queryParams.capacity = { gte: cap };
+      } else {
+        delete queryParams.capacity;
+      }
+    }
+
+    // Ignore empty or 'All' type filter
+    if (!queryParams.type || queryParams.type.toLowerCase() === 'all') {
+      delete queryParams.type;
+    }
+
+    // Support search keyword by room name or description
+    if (queryParams.search && queryParams.search.trim()) {
+      const searchRegex = new RegExp(queryParams.search.trim(), 'i');
+      query = query.find({
+        $or: [{ name: searchRegex }, { description: searchRegex }]
+      });
+      delete queryParams.search;
+    }
+
+    const features = new APIFeatures(query, queryParams).filter().sort().paginate();
     const rooms = await features.query;
     res.status(200).json({ success: true, count: rooms.length, data: rooms });
   } catch (err) { next(err); }

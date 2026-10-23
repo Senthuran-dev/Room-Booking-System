@@ -69,8 +69,8 @@ The platform utilizes a structured design system focused on **Hospitality Excell
 ## Key Features
 
 ### Guest Features
-- Browse, search, and filter rooms by type, capacity, price, and availability dates
-- View room galleries, amenities, ratings, and detailed descriptions
+- Browse, search, and filter rooms by type, capacity, price, and availability dates with real-time room count and instant filter reset
+- View room galleries, detailed descriptions, and full amenities with dedicated Lucide icons
 - Book rooms with date selection, price calculation (including 15% tax), and a dedicated confirmation page
 - View booking history with status tracking and cancellation
 - Rate and review rooms after completing a stay (via review modal)
@@ -78,14 +78,16 @@ The platform utilizes a structured design system focused on **Hospitality Excell
 
 ### Admin Features
 - Dashboard with real-time analytics (daily bookings, monthly revenue, occupancy rate, total users)
-- Full CRUD room management with Cloudinary image uploads
+- Full CRUD room management with Cloudinary image uploads, custom amenity creator, and click-to-zoom image inspection
+- Interactive Room Preview Modal with multi-photo carousel, thumbnail navigation, key metrics, and direct live links
+- Direct "Browse Live Rooms" navigation link to inspect rooms from the guest perspective
 - Booking management with status workflow (Pending → Confirmed → Completed / Cancelled)
 - User management (view all users, promote/demote roles, delete accounts)
 - Review moderation (delete inappropriate reviews)
 
 ### Security & Reliability
 - **Concurrency Control:** Utilizes MongoDB transactions and explicit write locks to guarantee zero double-bookings under concurrent load.
-- **Security Middleware:** Implements `helmet` for robust HTTP header security and `express-rate-limit` to mitigate brute-force and DoS attacks.
+- **Security Middleware:** Implements `helmet` for robust HTTP header security, CORS origin restrictions, and `express-rate-limit` to mitigate brute-force and DoS attacks.
 - **Render Wake-up:** Free-tier cold-start wake-up strategy implemented via automatic `/health` ping on frontend load.
 
 ## Setup Instructions
@@ -104,6 +106,7 @@ The platform utilizes a structured design system focused on **Hospitality Excell
 - `CLOUDINARY_API_KEY` - Cloudinary API key
 - `CLOUDINARY_API_SECRET` - Cloudinary API secret
 - `PORT` - Server port (default: `5000`)
+- `FRONTEND_URL` - Allowed client origin for CORS (default: `http://localhost:5173`)
 
 **Client** (`/client/.env`):
 - `VITE_API_URL` - API base URL (default: `http://localhost:5000/api/v1`)
@@ -126,9 +129,3 @@ The platform utilizes a structured design system focused on **Hospitality Excell
    - For backend: `npm run dev` in the `/server` directory
    - For frontend: `npm run dev` in the `/client` directory
 
-4. (Optional) Seed the database:
-   ```bash
-   cd server
-   node src/utils/seeder.js        # Import sample rooms
-   node src/utils/seeder.js -d     # Destroy all rooms
-   ```
