@@ -1,6 +1,11 @@
 import api from './api';
 
 export const getRooms = async (params) => {
+  if (typeof params === 'string') {
+    const query = params.startsWith('?') ? params : params ? `?${params}` : '';
+    const response = await api.get(`/rooms${query}`);
+    return response.data;
+  }
   const response = await api.get('/rooms', { params });
   return response.data;
 };

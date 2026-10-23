@@ -24,11 +24,22 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-const frontendUrl = process.env.FRONTEND_URL;
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173',
+  'http://127.0.0.1:5173'
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: frontendUrl,
-    credentials: false
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or same-origin)
+      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+        return callback(null, true);
+      }
+      callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true
   })
 );
 app.use(express.json());

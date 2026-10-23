@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import RoomGallery from '../components/rooms/RoomGallery';
 import StarRating from '../components/shared/StarRating';
 import BookingForm from '../components/bookings/BookingForm';
-import { Wifi, Tv, Coffee } from 'lucide-react';
+import AmenityIcon from '../components/shared/AmenityIcon';
 
 import { getRoomById } from '../services/room.service';
 
@@ -53,14 +53,14 @@ const RoomDetailPage = () => {
           </div>
 
           <div>
-            <h2 className="text-xl font-bold text-[#1b1b1d] mb-4">Amenities</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {room.amenities.map((amenity, idx) => (
-                <div key={idx} className="flex items-center text-[#43474e]">
-                  {amenity === 'Free WiFi' && <Wifi className="h-5 w-5 mr-2 text-primary" />}
-                  {amenity === 'TV' && <Tv className="h-5 w-5 mr-2 text-primary" />}
-                  {amenity === 'Coffee Maker' && <Coffee className="h-5 w-5 mr-2 text-primary" />}
-                  <span className="ml-1">{amenity}</span>
+            <h2 className="text-xl font-bold text-[#1b1b1d] mb-4">Included Amenities</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {room.amenities && room.amenities.map((amenity, idx) => (
+                <div key={idx} className="flex items-center p-2.5 rounded-xl bg-slate-50 border border-gray-100 hover:border-blue-100 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-primary flex items-center justify-center mr-3 flex-shrink-0">
+                    <AmenityIcon name={amenity} className="h-4 w-4" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-800">{amenity}</span>
                 </div>
               ))}
             </div>

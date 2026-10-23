@@ -164,7 +164,7 @@ The shape language is "Rounded," striking a balance between the rigid profession
 
 ### Status Badges & Tags
 - **Status Pills:** Pill-shaped with a light tinted background and dark text (e.g., Confirmed uses a light green background with #2D7D46 text).
-- **Room Tags:** Small pills with a thin Primary Navy outline and Navy text; used for amenities like "Free WiFi" or "AC."
+- **Room Tags & Amenity Chips:** Pill-shaped tags featuring dedicated Lucide icons and text; used for amenities like "Free WiFi", "Lake View", and "Coffee Maker". In admin management, selected chips highlight with primary fill (`bg-primary text-white`) and custom-created amenities include an inline remove button.
 - **Role Badges:** Admin uses blue-tinted pills (bg-blue-100 / text-blue-800); User uses neutral gray pills (bg-gray-100 / text-gray-800).
 
 ### Cards
@@ -176,6 +176,8 @@ The shape language is "Rounded," striking a balance between the rigid profession
 
 ### Modals
 - **ReviewModal:** Overlay modal for submitting room reviews. Contains a StarRating input, comment textarea, and submit/cancel buttons. Uses Level 2 elevation shadow with a semi-transparent backdrop.
+- **Room Preview Modal:** Comprehensive Level 2 elevation modal with backdrop blur for previewing room listings in Manage Rooms. Features an interactive photo gallery/carousel with prev/next arrows and thumbnail strip, key metrics grid (Price, Capacity, Type, Rating), formatted description, amenity icon chips, and direct actions ("Open Live Page", "Edit Room", and "Close").
+- **Image Lightbox Modal:** Deep focus full-screen overlay with dark backdrop blur (`bg-black/80`) allowing admins to zoom and inspect room photos in full resolution.
 
 ### Confirmation Pages
 - **ConfirmBookingPage:** Two-column layout (reservation details + price summary sidebar). Displays check-in/check-out dates, guest count, payment method indicator, itemized price breakdown with 15% tax, and a prominent "Complete Booking" CTA. Success state shows a CheckCircle animation with auto-redirect.
