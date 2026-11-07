@@ -4,7 +4,9 @@ const sendToken = require('../utils/sendToken');
 exports.register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
-    const user = await User.create({ name, email, password });
+    const cleanEmail = email?.trim().toLowerCase();
+    const cleanName = name?.trim();
+    const user = await User.create({ name: cleanName, email: cleanEmail, password });
     sendToken(user, 201, res);
   } catch (err) { next(err); }
 };
@@ -14,7 +16,8 @@ exports.login = async (req, res, next) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ success: false, message: 'Please provide an email and password' });
 
-    const user = await User.findOne({ email }).select('+password');
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail }).select('+password');
     if (!user || !(await user.matchPassword(password))) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }

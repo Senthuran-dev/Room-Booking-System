@@ -21,13 +21,23 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Optional: Intercept responses to handle 401 Unauthorized globally
+// Intercept responses to handle 401 Unauthorized globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    const url = error.config?.url || '';
+    const isLoginOrRegister = url.includes('/auth/login') || url.includes('/auth/register');
+    const isGetMe = url.includes('/auth/me');
+
     if (error.response?.status === 401) {
-      useAuthStore.getState().logout();
-      window.location.href = '/login';
+      // Don't interfere with login/register credential error handling in forms
+      if (!isLoginOrRegister) {
+        useAuthStore.getState().logout();
+        // Avoid redirecting during session rehydration or if already on login page
+        if (!isGetMe && window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      }
     }
     return Promise.reject(error);
   }
