@@ -1,15 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../../services/auth.service';
 import { useAuthStore } from '../../store/useAuthStore';
-import { User, Mail, Lock } from 'lucide-react';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const setAuth = useAuthStore(state => state.setAuth);
+  const { user, isAuthLoading, setAuth } = useAuthStore();
+
+  useEffect(() => {
+    if (user && !isAuthLoading) {
+      navigate('/', { replace: true });
+    }
+  }, [user, isAuthLoading, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +25,9 @@ const RegisterForm = () => {
     setLoading(true);
     
     try {
-      const { name, email, password } = formData;
+      const name = formData.name.trim();
+      const email = formData.email.trim().toLowerCase();
+      const password = formData.password;
       const data = await register({ name, email, password });
       setAuth(data.user, data.token);
       navigate('/');

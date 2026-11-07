@@ -129,3 +129,4 @@ The platform utilizes a structured design system focused on **Hospitality Excell
    - For backend: `npm run dev` in the `/server` directory
    - For frontend: `npm run dev` in the `/client` directory
 
+   The backend root URL (`http://localhost:5000/`) returns an API status response. The detailed health endpoint is available at `http://localhost:5000/api/v1/health`.

@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { login } from '../../services/auth.service';
 import { useAuthStore } from '../../store/useAuthStore';
-import { Mail, Lock } from 'lucide-react';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -10,7 +9,17 @@ const LoginForm = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const setAuth = useAuthStore(state => state.setAuth);
+  const location = useLocation();
+  const { user, isAuthLoading, setAuth } = useAuthStore();
+
+  const from = location.state?.from?.pathname || '/';
+
+  // If already authenticated, redirect to destination
+  useEffect(() => {
+    if (user && !isAuthLoading) {
+      navigate(from, { replace: true });
+    }
+  }, [user, isAuthLoading, navigate, from]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,9 +27,10 @@ const LoginForm = () => {
     setLoading(true);
     
     try {
-      const data = await login(email, password);
+      const trimmedEmail = email.trim().toLowerCase();
+      const data = await login(trimmedEmail, password);
       setAuth(data.user, data.token); // sendToken wraps user in data
-      navigate('/');
+      navigate(from, { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to log in. Please check your credentials.');
     } finally {

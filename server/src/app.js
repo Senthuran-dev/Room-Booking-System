@@ -45,6 +45,13 @@ app.use(
 app.use(express.json());
 
 // Routes
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'StayEase API is running',
+    version: '1.0.0',
+  });
+});
+
 app.get('/api/v1/health', (req, res) => {
   res.status(200).json({ success: true, status: 'ok', service: 'stayease-api' });
 });

@@ -24,6 +24,9 @@ const Navbar = () => {
             </Link>
             <div className="hidden md:ml-6 md:flex md:space-x-8">
               <Link to="/rooms" className="text-[#1b1b1d] hover:text-primary px-3 py-2 text-sm font-medium transition-colors">Rooms</Link>
+              {user && (
+                <Link to="/bookings" className="text-[#1b1b1d] hover:text-primary px-3 py-2 text-sm font-medium transition-colors">My Bookings</Link>
+              )}
             </div>
           </div>
           <div className="hidden md:flex items-center space-x-4">
@@ -67,6 +70,7 @@ const Navbar = () => {
                 {user.role === 'admin' && (
                   <Link to="/admin/dashboard" className="block px-3 py-2 text-base font-medium text-accent hover:bg-slate-50 rounded-md">Admin Dashboard</Link>
                 )}
+                <Link to="/bookings" className="block px-3 py-2 text-base font-medium text-[#1b1b1d] hover:bg-slate-50 rounded-md">My Bookings</Link>
                 <Link to="/profile" className="block px-3 py-2 text-base font-medium text-[#1b1b1d] hover:bg-slate-50 rounded-md">Profile</Link>
                 <button onClick={handleLogout} className="w-full text-left px-3 py-2 text-base font-medium text-[#1b1b1d] hover:bg-slate-50 rounded-md">Log out</button>
               </>
